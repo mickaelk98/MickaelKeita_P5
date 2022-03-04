@@ -6,7 +6,6 @@ const displayHomeProduscts = () => {
   fetch(url)
     .then((res) =>
       res.json().then((products) => {
-        console.log(products);
         for (product of products) {
           homeProduct.innerHTML += `<a href="./product.html?id=${product._id}">
             <article>
