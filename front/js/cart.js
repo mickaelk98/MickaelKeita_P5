@@ -1,7 +1,6 @@
 const cart = document.getElementById("cart__items");
 const allProducts = JSON.parse(localStorage.getItem("totalcart"));
 const clearBtn = document.getElementsByClassName("deleteItem");
-console.log(allProducts, clearBtn);
 
 for (let i = 0; i < allProducts.length; i++) {
   fetch(`http://localhost:3000/api/products/${allProducts[i].id}`)

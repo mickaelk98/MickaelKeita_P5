@@ -28,37 +28,60 @@ const displaProductDetail = () => {
         for (color of product.colors) {
           selectTag.innerHTML += `<option value="${color}">${color}</option>`;
         }
+        quantity.setAttribute("value", "1");
       })
     )
     .catch((err) => console.log("Erreur : " + err));
-  quantity.setAttribute("value", "1");
 };
 
-//* Fonction qui ajout au panier
+//* Fonction pour ajouter un produit au panier
 const addToCart = () => {
-  const btnAddToCart = document.getElementById("addToCart");
+  const btnAddCart = document.getElementById("addToCart");
 
-  //* Si il y a deja des produits dans le localstorage
-  btnAddToCart.addEventListener("click", () => {
-    const cart = {
+  btnAddCart.addEventListener("click", () => {
+    //* contenu du panier dans le localstorage
+    let totalCart = JSON.parse(localStorage.getItem("article"));
+    let cart = {
       id: id,
-      quantity: quantity.value,
+      quantity: Math.floor(quantity.value),
       color: selectTag.value,
     };
 
-    let totalCart = JSON.parse(localStorage.getItem("totalcart"));
-
-    if (totalCart) {
-      console.log("j'ai qqch'");
-      totalCart.push(cart);
-      localStorage.setItem("totalcart", JSON.stringify(totalCart));
-    } else {
+    //* si le pannier est vide
+    if (totalCart == null) {
       totalCart = [];
       totalCart.push(cart);
-      console.log(totalCart);
-      localStorage.setItem("totalcart", JSON.stringify(totalCart));
+      //* ajout du produit dans le localstorage(panier)
+      localStorage.setItem("article", JSON.stringify(totalCart));
+    }
+    //* si il y a deja un ou plusieur produit dans le panier
+    else if (totalCart != null) {
+      for (let i = 0; i < totalCart.length; i++) {
+        //* si le produit que l'on veut rajouter est deja dans le tableau
+        if (totalCart[i].id == id && totalCart[i].color == selectTag.value) {
+          return (
+            (totalCart[i].quantity += cart.quantity),
+            localStorage.setItem("article", JSON.stringify(totalCart)),
+            (totalCart = JSON.parse(localStorage.getItem("article")))
+          );
+        }
+      }
+      for (let i = 0; i < totalCart.length; i++) {
+        if (
+          (totalCart[i].id == id && totalCart[i].color != selectTag.value) ||
+          totalCart[i].id != id
+        ) {
+          return (
+            totalCart.push(cart),
+            localStorage.setItem("article", JSON.stringify(totalCart)),
+            (totalCart = JSON.parse(localStorage.getItem("article")))
+          );
+        }
+      }
     }
   });
+
+  return (totalCart = JSON.parse(localStorage.getItem("article")));
 };
 
 displaProductDetail();
