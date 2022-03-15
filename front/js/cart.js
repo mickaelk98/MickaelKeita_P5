@@ -1,45 +1,84 @@
-const cart = document.getElementById("cart__items");
-const allProducts = JSON.parse(localStorage.getItem("article"));
-const clearBtn = document.getElementsByClassName("deleteItem");
-const totalArticle = document.getElementById("totalQuantity");
-const totalPrice = document.getElementById("totalPrice");
+let allProducts = JSON.parse(localStorage.getItem("article"));
 
-let quantityCalcul = 0;
-let priceCalcul = 0;
+//* fonction qui affiche les article de mon panier
+const displayCart = () => {
+  const cart = document.getElementById("cart__items");
+  const totalArticle = document.getElementById("totalQuantity");
+  const totalPrice = document.getElementById("totalPrice");
+  let quantityCalcul = 0;
+  let priceCalcul = 0;
 
-for (let i = 0; i < allProducts.length; i++) {
-  fetch(`http://localhost:3000/api/products/${allProducts[i].id}`)
-    .then((res) =>
-      res.json().then((product) => {
-        cart.innerHTML += `
-            <article class="cart__item" data-id="${allProducts[i].id}" data-color="${allProducts[i].color}">
-                <div class="cart__item__img">
-                <img src="${product.imageUrl}" alt="${product.altTxt}">
-                </div>
-                <div class="cart__item__content">
-                  <div class="cart__item__content__description">
-                    <h2>${product.name}</h2>
-                    <p>${allProducts[i].color}</p>
-                    <p>${product.price} €</p>
+  //* affiche chaque produit present dans le panier
+  for (let i = 0; i < allProducts.length; i++) {
+    fetch(`http://localhost:3000/api/products/${allProducts[i].id}`)
+      .then((res) =>
+        res.json().then((product) => {
+          cart.innerHTML += `
+              <article class="cart__item" data-id="${allProducts[i].id}" data-color="${allProducts[i].color}">
+                  <div class="cart__item__img">
+                  <img src="${product.imageUrl}" alt="${product.altTxt}">
                   </div>
-                  <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                      <p>Qté : </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${allProducts[i].quantity}">
+                  <div class="cart__item__content">
+                    <div class="cart__item__content__description">
+                      <h2>${product.name}</h2>
+                      <p>${allProducts[i].color}</p>
+                      <p>${product.price} €</p>
                     </div>
-                    <div class="cart__item__content__settings__delete">
-                      <p class="deleteItem">Supprimer</p>
+                    <div class="cart__item__content__settings">
+                      <div class="cart__item__content__settings__quantity">
+                        <p>Qté : </p>
+                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${allProducts[i].quantity}">
+                      </div>
+                      <div class="cart__item__content__settings__delete">
+                        <p class="deleteItem">Supprimer</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-            </article>
-      `;
-        quantityCalcul += allProducts[i].quantity;
-        priceCalcul += allProducts[i].quantity * product.price;
-        //* total article et prix
-        totalArticle.textContent = `${quantityCalcul}`;
-        totalPrice.textContent = `${priceCalcul}`;
-      })
-    )
-    .catch((err) => console.log("Erreu : " + err));
-}
+              </article>
+        `;
+          quantityCalcul += allProducts[i].quantity;
+          priceCalcul += allProducts[i].quantity * product.price;
+          //* total article et prix
+          totalArticle.textContent = `${quantityCalcul}`;
+          totalPrice.textContent = `${priceCalcul}`;
+        })
+      )
+      .catch((err) => console.log("Erreur : " + err));
+  }
+};
+
+//* fonction qui supprime un article du panier
+const removeProduct = () => {
+  const clearBtn = document.getElementsByClassName("deleteItem");
+
+  setTimeout(() => {
+    for (let i = 0; i < clearBtn.length; i++) {
+      //* ajoute un index a chaque boutton
+      clearBtn[i].setAttribute("data-index", i);
+
+      //* au clique sur un boutton supprimer
+      clearBtn[i].addEventListener("click", (e) => {
+        console.log(e);
+        let btn = e.currentTarget;
+        //* recupere l'index du boutton sur lequel on a cliqué
+        btnIndex = btn.getAttribute("data-index");
+
+        //* si il y a plus de 1 article dans le panier
+        if (allProducts.length > 1) {
+          allProducts.splice(btnIndex, 1);
+          localStorage.setItem("article", JSON.stringify(allProducts));
+          allProducts = JSON.parse(localStorage.getItem("article"));
+          location.reload();
+        } else {
+          localStorage.clear();
+          allProducts = JSON.parse(localStorage.getItem("article"));
+          location.reload();
+        }
+      });
+    }
+  }, 500);
+};
+
+//* appelle des fonctions
+displayCart();
+removeProduct();
