@@ -79,6 +79,23 @@ const removeProduct = () => {
   }, 500);
 };
 
+//* fonction qui change la quantite d'un produit
+const changeQuantity = () => {
+  const quantity = document.getElementsByClassName("itemQuantity");
+  console.log(quantity);
+  setTimeout(() => {
+    for (let i = 0; i < quantity.length; i++) {
+      quantity[i].addEventListener("change", (e) => {
+        console.log(e.target.value);
+        allProducts[i].quantity = parseInt(e.target.value);
+        localStorage.setItem("article", JSON.stringify(allProducts));
+        allProducts = JSON.parse(localStorage.getItem("article"));
+      });
+    }
+  }, 500);
+};
+
 //* appelle des fonctions
 displayCart();
 removeProduct();
+changeQuantity();
