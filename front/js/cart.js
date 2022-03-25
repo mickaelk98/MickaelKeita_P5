@@ -273,10 +273,9 @@ form.addEventListener("submit", (e) => {
         console.log(data);
         console.log(data.orderId);
         //* redirection vres la page confirmation
-        window.location.href = `http://127.0.0.1:5500/front/html/confirmation.html?id=${data.orderId}`
+        form.submit();
+        window.location.href = `http://127.0.0.1:5500/front/html/confirmation.html?id=${data.orderId}`;
       })
       .catch((err) => console.log("Erreur : " + err));
-  } else {
-    console.log("pas bon");
   }
 });
