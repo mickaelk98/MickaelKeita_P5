@@ -2,6 +2,7 @@ let allProducts = JSON.parse(localStorage.getItem("article"));
 const adresse = document.getElementById("address");
 const city = document.getElementById("city");
 const email = document.getElementById("email");
+const form = document.querySelector(".cart__order__form");
 
 //* fonction qui affiche les article de mon panier
 const displayCart = () => {
@@ -236,16 +237,23 @@ email.addEventListener("change", function () {
 });
 
 //* Ecoute de l'envoie du formulaire
-const form = document.querySelector(".cart__order__form");
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  //* creation de l'objet contact
   let contact = {
     firstName: firstName.value,
     lastName: lastName.value,
-    adresse: adresse.value,
+    address: adresse.value,
     city: city.value,
     email: email.value,
   };
+  console.log(contact);
+  //* cration du tableau produit(contenant uniquement les id des produits)
+  let products = [];
+  for (let i = 0; i < allProducts.length; i++) {
+    products.push(allProducts[i].id);
+    console.log(products);
+  }
   if (
     validFirstname(firstName) &&
     validLastName(lastName) &&
@@ -253,10 +261,21 @@ form.addEventListener("submit", (e) => {
     validCity(city) &&
     validEmail(email)
   ) {
-    console.log("ok");
-    console.log(contact);
-    console.log(JSON.stringify(allProducts));
-    // form.submit();
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        "content-Type": "application/json",
+      },
+      body: JSON.stringify({ contact, products }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        console.log(data.orderId);
+        //* redirection vres la page confirmation
+        window.location.href = `http://127.0.0.1:5500/front/html/confirmation.html?id=${data.orderId}`
+      })
+      .catch((err) => console.log("Erreur : " + err));
   } else {
     console.log("pas bon");
   }
